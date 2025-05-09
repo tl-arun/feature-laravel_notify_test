@@ -1,29 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import echo from './Echo';
 
-const NotificationBox = ({ userId }) => {
+const NotificationBox = ({ userId, echo }) => {
     const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
-        if (!userId) return;
+        if (!echo) return;
 
         const channel = echo.private(`notifications.${userId}`);
 
         channel.listen('.notification.sent', (e) => {
-            setNotifications((prev) => [e.notification, ...prev]);
+            setNotifications((prev) => [...prev, e.notification]);
         });
 
         return () => {
             echo.leave(`notifications.${userId}`);
         };
-    }, [userId]);
+    }, [userId, echo]);
 
     return (
-        <div style={{ padding: 20 }}>
-            <h2>Real-Time Notifications</h2>
+        <div>
+            <h2>Notifications</h2>
             <ul>
-                {notifications.map((note, index) => (
-                    <li key={index}>{note.message}</li>
+                {notifications.map((n, index) => (
+                    <li key={index}>{n.message}</li>
                 ))}
             </ul>
         </div>
